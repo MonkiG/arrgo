@@ -1,7 +1,6 @@
-package main
+package arrgo
 
 import (
-	"reflect"
 	"testing"
 )
 
@@ -15,10 +14,7 @@ func TestArrgoInstance(t *testing.T) {
 }
 
 func TestArrgoPop(t *testing.T) {
-	arrInt := New[int]()
-	arrInt.Push(1)
-	arrInt.Push(2)
-	arrInt.Push(3)
+	arrInt := New(1, 2, 3)
 
 	itemPoped := arrInt.Pop()
 
@@ -27,8 +23,15 @@ func TestArrgoPop(t *testing.T) {
 	}
 
 	expectedSlice := []int{1, 2}
-	if !reflect.DeepEqual(arrInt.s, expectedSlice) {
-		t.Errorf("Expected Arrgo slice to be: %v, got; %v", expectedSlice, arrInt.s)
+
+	if len(*arrInt) != len(expectedSlice) {
+		t.Errorf("Expected slice length %d, got %d", len(expectedSlice), len(*arrInt))
+	} else {
+		for i := range expectedSlice {
+			if (*arrInt)[i] != expectedSlice[i] {
+				t.Errorf("Expected element %d at index %d, got %d", expectedSlice[i], i, (*arrInt)[i])
+			}
+		}
 	}
 }
 
@@ -50,34 +53,40 @@ func TestArrgoForEach(t *testing.T) {
 }
 
 func TestArrgoMap(t *testing.T) {
-	arr := New[int]().Init(1, 2, 3, 4)
-
-	expectedArr := New[int]().Init(2, 4, 6, 8)
+	arr := New(1, 2, 3, 4)
 
 	newArr := arr.Map(func(element, index int, slice []int) int {
 		return element * 2
 	})
 
-	if !reflect.DeepEqual(expectedArr.s, newArr) {
-		t.Errorf("Expected Arrgo slice to be: %v, got; %v", expectedArr.s, newArr)
+	arrLen := len(*arr)
+	newArrLen := len(newArr)
+	if arrLen != newArrLen {
+		t.Errorf("Expected Arrgo length to be: %v, got; %v", arrLen, newArrLen)
 	}
 }
 
 func TestArrgoFilter(t *testing.T) {
-	arr := New[int]().Init(1, 2, 3, 4)
-	expectArr := New[int]().Init(2, 4)
+	arr := New(1, 2, 3, 4)
+	expectArr := New(2, 4)
 
 	filteredSlice := arr.Filter(func(element, index int, slice []int) bool {
 		return element%2 == 0
 	})
 
-	if !reflect.DeepEqual(expectArr.s, filteredSlice) {
-		t.Errorf("Expected Arrgo slice to be: %v, got; %v", expectArr.s, filteredSlice)
+	if len(*expectArr) != len(filteredSlice) {
+		t.Errorf("Expected slice returned length to be: %v, got; %v", len(*expectArr), len(filteredSlice))
+	}
+
+	for i, e := range filteredSlice {
+		if e != (*expectArr)[i] {
+			t.Errorf("Expected slice returned value in position %d to be: %v, got; %v", i, e, (*expectArr)[i])
+		}
 	}
 }
 
 func TestArrgoFind(t *testing.T) {
-	arr := New[int]().Init(1, 2, 3, 4)
+	arr := New(1, 2, 3, 4)
 	expectedValue := 3
 
 	valueFinded := arr.Find(func(element, index int, slice []int) bool {

@@ -1,7 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/monkig/arrgo/arrgo"
+)
 
 func main() {
-	fmt.Println("Arr lul")
+	myArrgo := arrgo.New[int]()
+	fmt.Println(myArrgo)
 }
